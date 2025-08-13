@@ -1,0 +1,32 @@
+#include <iostream>
+#include <fstream>
+#include "lexer/lexer.hpp"
+#define LEXER_DEBUG true
+
+int main(int argc, char *argv[]) {
+  // varnc <file1>
+  if (argc < 2) {
+    std::cerr << "Usage: " << argv[0] << " file.vrn " << std::endl;
+    return 1;
+  } else {
+    std::string fileContent;
+    std::ifstream file(argv[1]);
+    if(!file){
+        printf("%s didnt exsist \n", argv[1]);
+    }
+    std::string line;
+
+    while(std::getline(file, line)){
+        fileContent += line +'\n';
+    } 
+    file.close();
+    printf("%s \n",fileContent.c_str());
+    Lexer lex;
+    auto toks = lex.tokenize(fileContent);
+    if(LEXER_DEBUG){
+        for (const auto& token : toks) {
+            std::cout << "Token: " << token.type << " Value: " << token.value << std::endl;
+        }
+    }
+  }
+}

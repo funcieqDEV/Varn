@@ -1,0 +1,276 @@
+
+grammar varn;
+
+program
+    : topLevelStatements* EOF
+    ;
+
+topLevelStatements:
+     importStatement
+    | ((PUB | PRIV)? functionDeclaration)
+    | externalFunctionDeclaration
+    | moduleStatement
+    | ((PUB | PRIV)? structStatement)
+    | implStatement
+    | ((PUB | PRIV)? enumStatement)
+    ;
+
+sizedArray:
+    SQUARE_LBRACE expression SQUARE_RBRACE
+    ;
+
+structStatement:
+    STRUCT constId genericParameters? LBRACE structField* RBRACE 
+    ;
+structInitializer:
+    constId LBRACE (constId ASSIGN expression(COMMA constId ASSIGN expression)*)? RBRACE
+;
+
+implStatement:
+    IMPL constId LBRACE ((PUB | PRIV)? STATIC? functionDeclaration)* RBRACE
+    ;
+structField:
+    constId COLON type SEMICOLON
+    | constId COLON type ASSIGN expression SEMICOLON // Optional default value
+    ;
+genericParameters:
+    LESS type (COMMA type)* GREATER
+    ;
+enumStatement:
+    ENUM constId LBRACE enumVariantList RBRACE
+    ;
+enumVariantList
+    : enumVariant (COMMA enumVariant)* COMMA?
+    ;
+
+enumVariant
+    : constId
+    | constId LPAREN type RPAREN
+    ;
+
+moduleStatement:
+    MODULE constId SEMICOLON
+    ;
+//import
+importStatement:
+    IMPORT importPath SEMICOLON
+    ;
+importPath
+    : constId (DOT constId)* // Allow dot-separated identifiers
+    ;
+//function
+functionDeclaration:
+    FUN constId genericParameters? LPAREN parameterList? RPAREN ARROW constId body
+    | FUN constId genericParameters? LPAREN parameterList? RPAREN LAMBDA expression SEMICOLON
+    |FUN constId genericParameters? LPAREN parameterList? RPAREN ARROW constId SEMICOLON
+    | FUN constId genericParameters? LPAREN parameterList? RPAREN body
+    ;
+externalFunctionDeclaration:
+    EXTERN functionDeclaration
+;
+// keywords
+parameterList
+    : constId COLON type (COMMA constId COLON type)* // Allow multiple parameters
+    ;
+body
+    : LBRACE statement* RBRACE;
+statement
+    : expression SEMICOLON
+    | ifStatement
+    | returnStatement
+    | whileStatement
+    | forStatement
+    | variableDeclaration
+    | assigmentStatement
+    | matchStatement
+    ;
+returnStatement:
+    RETURN expression SEMICOLON
+    |RETURN SEMICOLON
+;
+ifStatement:
+    IF LPAREN expression RPAREN body (ELSE body)?
+;
+whileStatement:
+    WHILE LPAREN expression RPAREN body
+    ;
+forStatement:
+    FOR LPAREN variableDeclaration SEMICOLON expression SEMICOLON assigmentStatement RPAREN body
+    ;
+matchStatement:
+    MATCH  expression  LBRACE matchCase* RBRACE
+    ;
+matchCase:
+     expression LAMBDA body
+    ;
+variableDeclaration:
+    (LET constId ASSIGN expression SEMICOLON) 
+    | (LET constId SEMICOLON)
+    | (LET constId COLON type ASSIGN expression SEMICOLON)
+    | (LET constId COLON type SEMICOLON) 
+;
+assigmentStatement:
+    constId ASSIGN expression SEMICOLON
+    ;
+expression
+    : primaryExpression postfixExpression*
+    | NOT expression
+    | MINUS expression
+    | PLUS expression
+    | expression PLUS expression
+    | expression MINUS expression
+    | expression MULTIPLY expression
+    | expression DIVIDE expression
+    | expression LESSEQUAL expression
+    | expression GREATER expression
+    | expression GREATEREQUAL expression
+    | expression LESS expression
+    | expression EQUAL expression
+    | expression AND expression
+    | expression OR expression
+    | expression MODULO expression
+    | expression POW expression
+    ;
+    
+primaryExpression
+    : structInitializer
+    | constId
+    | constInt
+    | constFloat
+    | constString
+    | constBool
+    | constChar
+    | LPAREN expression RPAREN
+    | listInitializer
+    | functionCallWithoutReceiver
+    | anonymousFunction
+    ;
+
+postfixExpression
+    : (DOT || DOUBLECOLON) constId LPAREN argumentList? RPAREN
+    | (DOT || DOUBLECOLON) constId
+    | LPAREN argumentList? RPAREN
+    ;
+
+functionCallWithoutReceiver
+    : constId LPAREN argumentList? RPAREN
+    ;
+
+
+listInitializer:
+    LBRACE expression (COMMA expression)* RBRACE
+    | SQUARE_LBRACE expression (COMMA expression)* SQUARE_RBRACE
+;
+functionCall
+    : constId LPAREN argumentList? RPAREN
+    ;
+argumentList
+    : expression (COMMA expression)* 
+    ;
+
+//constants
+constInt:
+    INTEGER
+;
+
+constString:
+    STRING
+;
+
+constFloat:
+    FLOAT
+;
+
+constChar:
+    CHAR
+;
+
+constBool:
+    BOOL
+;
+
+constId:
+    ID
+;
+
+anonymousFunction:
+    FUN  genericParameters? LPAREN parameterList? RPAREN ARROW constId body
+    | FUN  genericParameters? LPAREN parameterList? RPAREN LAMBDA expression 
+    |FUN genericParameters? LPAREN parameterList? RPAREN ARROW constId 
+    | FUN  genericParameters? LPAREN parameterList? RPAREN body
+;
+
+IMPORT: 'import' ;
+FUN: 'fun' ;
+RETURN: 'return' | 'ret' ;
+IF: 'if' ;
+ELSE: 'else' ;
+WHILE: 'while' ;
+FOR: 'for' ;
+MATCH: 'match' ;
+LET: 'let' ;
+EXTERN: 'extern' ;
+MODULE: 'module' ;
+PUB: 'pub';
+PRIV: 'priv' ;
+STRUCT: 'struct' ;
+IMPL: 'impl';
+STATIC: 'static';
+ENUM: 'enum' ;
+SEMICOLON: ';';
+COLON: ':' ;
+DOUBLECOLON: '::';
+DOT: '.' ;
+COMMA: ',' ;
+LPAREN: '(' ;
+RPAREN: ')' ;
+LBRACE: '{' ;
+RBRACE: '}' ;
+ARRAY: '[]' ;
+SQUARE_LBRACE: '[' ;
+SQUARE_RBRACE: ']' ;
+QUESTION: '?' ;
+ARROW:  '->' ;
+LAMBDA: '=>' ;
+LESSEQUAL: '<=' ;
+LESS: '<' ;
+GREATER: '>' ;
+GREATEREQUAL: '>=' ;
+EQUAL: '==' ;
+ASSIGN: '=' ;
+PLUS: '+' ;
+MINUS: '-' ;
+MULTIPLY: '*' ;
+REFERENCE: '&' ;
+DIVIDE: '/' ;
+MODULO: '%' ;
+POW: '^' ;
+NOT: '!' ;
+AND: '&&' ;
+OR: '||' ;
+ID: [a-zA-Z_][a-zA-Z0-9_]*
+    | [A-Z][a-zA-Z0-9_]* // Allow capitalized identifiers
+    ;
+INTEGER: [0-9]+ ;
+FLOAT: [0-9]+ '.' [0-9]+
+    | [0-9]+ '.' [0-9]* 'f' // Float with 'f' suffix
+    | [0-9]+ 'f' // Float with 'f' suffix
+    ;
+STRING: '"' (~["])* '"' ;
+CHAR: '\'' (~['])* '\'' ; // Single character
+BOOL: 'true' | 'false';
+COMMENT: '//' ~[\r\n]* -> skip;
+LINE_COMMENT: '//' ~[\r\n]* -> skip;
+BLOCK_COMMENT: '/*' .*? '*/' -> skip;
+// Whitespace
+WS: [ \t\r\n]+ -> skip;
+type
+    : (REFERENCE | MULTIPLY)* arrayType? ID?
+    ;
+
+arrayType
+    : ARRAY               
+    | sizedArray            
+    ;
+
+

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include "lexer/lexer.hpp"
+#include "parser/parser.hpp"
 #define LEXER_DEBUG true
 
 int main(int argc, char *argv[]) {
@@ -23,10 +24,13 @@ int main(int argc, char *argv[]) {
     printf("%s \n",fileContent.c_str());
     Lexer lex;
     auto toks = lex.tokenize(fileContent);
+    Parser parser;
     if(LEXER_DEBUG){
         for (const auto& token : toks) {
             std::cout << "Token: " << token.type << " Value: " << token.value << std::endl;
         }
     }
+    parser.parse(toks);
   }
+  return 0;
 }

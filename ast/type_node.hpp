@@ -12,4 +12,5 @@ public:
     bool isPointer;
     bool isArray;
     ExpressionNode arraySize; //0 for non-array types
+    TypeNode(std::string typeName_) : typeName(typeName_), isReference(false), isPointer(false), isArray(false){}
 };

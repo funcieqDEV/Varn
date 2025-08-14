@@ -7,4 +7,5 @@
 class ExpressionNode : public Node {
 public:
     virtual ~ExpressionNode() = default;
+    ExpressionNode() = default;
 };

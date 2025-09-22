@@ -31,15 +31,47 @@ std::unique_ptr<FunDecl> Parser::parseFun() {
     return func;
 }
 
+std::unique_ptr<VarDecl> Parser::parseVarDecl() {
+    /*
+        let name = <expr>;
+        let name: type;
+        let name: type = <expr>;
+    */
+    consume(TokenType::LET);
+    
+    std::string id = consume(TokenType::ID, "Expected variable name.").value;
+    if (peek().type == TokenType::COLON) {
+		advance(); // consume ':'
+		auto type = parseType();
+        if (peek().type == TokenType::ASSIGN) {
+            advance(); 
+			// consume '='
+        } else {
+			consume(TokenType::SEMICOLON, "Expected ';' after variable declaration.");
+            return std::make_unique<VarDecl>(id, std::move(type), nullptr);
+		}
+    }
+
+}
 
 std::unique_ptr<BodyNode> Parser::parseBody(){
     auto body = std::make_unique<BodyNode>();
     consume(TokenType::LBRACE);
     while(!isAtEnd() && peek().type != TokenType::RBRACE){
-        //parseStatement should be here
+		body->addStatement(parseStatement());
     }
     consume(TokenType::RBRACE, "Expected '}' when funtion ends.");
     return body;
+}
+
+std::unique_ptr<StatementNode> Parser::parseStatement() {
+        if(peek().type == TokenType::LET){
+            return parseVarDecl();
+        }
+        else {
+			printf("Unexpected token in statement: %s at position %d\n", peek().value.c_str(), peek().pos);
+			exit(-1); // Handle unexpected tokens
+        }
 }
 std::vector<std::unique_ptr<ParameterNode>> Parser::parseParameters(){
     std::vector<std::unique_ptr<ParameterNode>> params;
@@ -58,7 +90,8 @@ std::vector<std::unique_ptr<ParameterNode>> Parser::parseParameters(){
                 consume(TokenType::COMMA);
             }
         }else {
-            consume(TokenType::RPAREN, "Expected ')' after parameters.");
+            pos_++;
+            break;
         }
     }
     return params;
@@ -79,6 +112,15 @@ Token Parser::consume(TokenType expected, std::string err_msg){
     }else {
     pos_++;
     return tok;
+    }
+}
+
+void Parser::advance() {
+    if (!isAtEnd()) {
+        pos_++;
+    }
+    else {
+        printf("parser can't advance! \n");
     }
 }
 Token Parser::peek(){

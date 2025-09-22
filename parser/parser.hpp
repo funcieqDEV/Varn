@@ -13,11 +13,18 @@ public:
     std::unique_ptr<RootNode>parse(std::vector<Token> toks);
     Token consume(TokenType expected, std::string err_msg="");
 	void advance();
+	Token next();
     //statements parsing
     std::unique_ptr<FunDecl>parseFun();
     std::vector<std::unique_ptr<ParameterNode>> parseParameters();
     std::unique_ptr<TypeNode> parseType();
     std::unique_ptr<BodyNode> parseBody();
+    std::unique_ptr<ExpressionNode> parseExpression();
+	std::unique_ptr<ExpressionNode> parsePrimary();
+    std::unique_ptr<ExpressionNode> parseTerm();
+	std::unique_ptr<ExpressionNode> parseFactor();
+    std::unique_ptr<ExpressionNode> parseUnary();
+
 	std::unique_ptr<StatementNode> parseStatement();
     std::unique_ptr<VarDecl> parseVarDecl();
     Token peek();

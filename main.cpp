@@ -2,7 +2,10 @@
 #include <fstream>
 #include "lexer/lexer.hpp"
 #include "parser/parser.hpp"
-#define LEXER_DEBUG true
+#include "compiler/compiler.hpp"
+#define LEXER_DEBUG false
+#define PARSER_DEBUG false
+#define COMPILER_DEBUG false
 
 int main(int argc, char *argv[]) {
   // varnc <file1>
@@ -30,7 +33,9 @@ int main(int argc, char *argv[]) {
             std::cout << "Token: " << token.type << " Value: " << token.value << std::endl;
         }
     }
-    parser.parse(toks);
+    auto root = parser.parse(toks);
+    Compiler compiler;
+    compiler.compile(std::move(root));
   }
   return 0;
 }

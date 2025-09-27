@@ -24,9 +24,13 @@ public:
     std::unique_ptr<ExpressionNode> parseTerm();
 	std::unique_ptr<ExpressionNode> parseFactor();
     std::unique_ptr<ExpressionNode> parseUnary();
+    std::unique_ptr<ExpressionNode> parseIntConst(Token current);
+    std::unique_ptr<ExpressionNode> parseConstId(Token current);
 
 	std::unique_ptr<StatementNode> parseStatement();
     std::unique_ptr<VarDecl> parseVarDecl();
+    std::unique_ptr<ReturnNode> parseReturn();
     Token peek();
+    Token peek(int offset);
     bool isAtEnd();
 };

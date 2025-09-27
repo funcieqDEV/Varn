@@ -19,3 +19,6 @@
 #include "unary_expr.hpp"
 #include "var_decl.hpp"
 #include "while_node.hpp"
+#include "break_node.hpp"
+#include "continue_node.hpp"
+#include "fun_call.hpp"

@@ -2,6 +2,7 @@
 #include <string>
 enum TokenType {
 //keywords
+
 IMPORT=1,
 FUN=2,
 RETURN=3,
@@ -11,13 +12,13 @@ WHILE=6,
 FOR=7,
 MATCH=8,
 LET=9,
-EXTERN=1,
+EXTERN=10,
 MODULE=11,
 PUB=12,
 PRIV=13,
-STRUCT=1,
+STRUCT=14,
 IMPL=15,
-STATIC=1,
+STATIC=16,
 ENUM=17,
 SEMICOLON=18,
 COLON=19,
@@ -56,6 +57,9 @@ FLOAT=51,
 STRING=52,
 CHAR=53,
 BOOL=54,
+BREAK=55,
+CONTINUE=56,
+ELLIPSIS=57, // ...
 };
 
 class Token {

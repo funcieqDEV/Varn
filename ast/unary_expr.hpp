@@ -2,7 +2,7 @@
 #include "expr_node.hpp"
 #include <memory>
 
-class UnaryExpr : ExpressionNode{
+class UnaryExpr : public ExpressionNode{
 public:
     std::string op_;
     std::unique_ptr<ExpressionNode> expr_;

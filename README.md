@@ -7,47 +7,67 @@
 </p>
 
 > [!WARNING]
-> Varn is in active development and is not production-ready. Many of the features and details described here are still unfinished.
+> Varn is in active development and not production-ready. Many features are unfinished.
 
 ---
 
-## What is Varn? 🚀🛠️🛡️
+## What is Varn? 🚀
 
-**Varn** is a modern, statically typed programming language that focuses on **simplicity** and **safety**. It allows you to write low-level code like in C while maintaining a modern syntax similar to Rust. ✨📦⚡
+**Varn** is a modern, low-level, statically typed programming language for system programming. It compiles to LLVM IR, enabling seamless interop with C/C++. Varn is inspired by C and Zig, but offers a more ergonomic, modular, and expressive syntax—without sacrificing control or performance.
 
----
-
-## Why Varn? 🤔💡🛡️
-
-You might ask: why use Varn at all? If I need low-level programming, I can use C, C++, or Zig. If I want safety, I can use Rust.
-However, each has its limitations:
-
-* C offers no memory protection, which can lead to dangerous errors.
-* Rust has excellent safety but is verbose and enforces strict rules that can slow development.
-
-**Varn** addresses these issues. You can write code freely, while **GMM** (Guardian Memory Model), a static analyzer, ensures memory safety. It detects common memory errors like use-after-free or dangling pointers **without runtime overhead**, giving you safe and efficient code.
+Varn is **not** "C with new syntax". It is a new take on low-level programming: no garbage collection, no hidden abstractions, and no runtime overhead. You get full control over the hardware, with modern language features and zero-cost abstractions.
 
 ---
 
-## What is GMM? 🛡️📊✨
+## Example Code
+>There is no std for now, we only use C functions
 
-**GMM – Guardian Memory Model** functions similarly to Rust’s borrow checker. Every object has a "guardian" that monitors its usage.
-Instead of imposing rigid rules, GMM politely informs you about potential memory errors.
-If you intentionally use advanced features like FFI, you can instruct GMM to ignore certain objects. This balance provides safety while keeping development flexible.
+**Hello, world:**
+
+```varn
+extern fun printf(fmt: str, ...) -> i32;
+
+fun main() -> i32 {
+	printf("Hello, world!\n");
+	ret 0;
+}
+```
+
+
+**String concatenation (no GC, manual memory):**
+
+```varn
+extern fun strlen(src: str) -> usize;
+extern fun malloc(size: usize) -> str;
+extern fun strcpy(dest: str, src: str) -> str;
+extern fun strcat(dest: str, src: str) -> str;
+
+fun concat(a: str, b: str) -> str {
+	let lenA: usize = strlen(a);
+	let lenB: usize = strlen(b);
+	let totalLen: usize = lenA + lenB + 1;
+	let result: str = malloc(totalLen);
+	strcpy(result, a);
+	strcat(result, b);
+	ret result;
+}
+```
 
 ---
 
-## Goals 🎯📝✨
+## Key Features
 
-* Enable easy development of **system-level applications** that are both reliable and secure.
-* Maintain a **high-quality developer experience** (UX) while handling low-level details.
-* Reduce verbosity compared to Rust while retaining memory safety and compile-time guarantees.
-* Encourage modular, maintainable code structures for larger projects.
-* Provide expressive constructs for enums, structs, pattern matching, and inline lambdas.
+- **LLVM backend**: Easy C/C++ interop, native codegen, and toolchain support.
+- **No garbage collection**: You manage memory—no hidden costs, no runtime.
+- **Zero-cost abstractions**: Modern syntax, pattern matching, enums, and more—without runtime penalty.
+- **Modular by default**: No `#include`, no header hell. Modules are first-class.
+- **Powerful standard library**: Lightweight but rich, written from scratch for Varn. (WIP)
+- **Inspired by C and Zig**: Familiar, but more ergonomic and expressive.
+- **No forced abstractions**: You decide how close to the hardware you want to be.
 
 ---
 
-## Build ⚙️🛠️📦
+## How to Build
 
 ```bash
 git clone https://github.com/funcieqDEV/Varn
@@ -55,23 +75,11 @@ cd Varn
 make
 ```
 
-> ⚠️ Warning: Varn is still in development. The build may be unstable.
+> ⚠️ Varn is under heavy development. The build may be unstable.
 
 ---
 
-## Contributing 🤝✨📘
 
-We welcome all PRs! Each PR should:
+## License
 
-* Include a clear description of what it adds.
-* Explain why the change is needed.
-* Include proper documentation for the added code.
-
----
-
-## License 📜⚖️✨
-
-The **Varn** project is licensed under the **Apache License 2.0**.
-You may freely use, modify, and distribute the source code, provided that all copyright and license notices are retained.
-The license also grants rights to any patents associated with the project.
-See the **[LICENSE](https://github.com/funcieqDEV/Varn/blob/main/LICENSE)** file for full terms.
+Varn is licensed under the Apache License 2.0. See [LICENSE](LICENSE).
